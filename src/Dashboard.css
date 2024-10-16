@@ -1,0 +1,36 @@
+.dashboard-container {
+  padding: 20px;
+  background-color: #f7f7f8;
+  height: 100vh;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px; /* Khoảng cách dưới cùng */
+}
+
+.stat-box {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  flex: 1; /* Làm cho các stat-box có kích thước bằng nhau */
+  margin: 0 10px; /* Khoảng cách giữa các stat-box */
+}
+
+.stat-box h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.stat-box p {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.chart-container {
+  margin-top: 20px; /* Khoảng cách trên cùng của đồ thị */
+}

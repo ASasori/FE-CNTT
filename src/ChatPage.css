@@ -1,0 +1,189 @@
+/* Toàn bộ trang chat */
+.chat-page {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #f0f0f0;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  position: relative;
+  transform: translateX(0);
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+  /* display: none; */
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar li:hover {
+  background-color: #d6d6d6;
+}
+
+/* Nút toggle Sidebar */
+.toggle-sidebar-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px; /* Tăng kích thước cho icon */
+  z-index: 10;
+}
+
+
+/* Container chính của trang chat */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #ffffff;
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+}
+
+.chat-container.with-sidebar {
+  margin-left: 0;
+}
+
+.chat-container.full-width {
+  margin-left: -250px;
+  
+  /* width: 100%; */
+}
+
+/* Cửa sổ chat */
+.chat-window {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f7f7f8;
+}
+
+/* Tin nhắn */
+.message {
+  max-width: 70%;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: #007bff;
+  color: white;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background-color: #e0e0e0;
+  color: black;
+}
+
+/* Thanh nhập liệu */
+.chat-input-container {
+  display: flex;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-top: 1px solid #e6e6e6;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.send-button, .new-conversation-button {
+  padding: 10px 20px;
+  background-color: #040405;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.send-button:hover, .new-conversation-button:hover {
+  background-color: #0056b3;
+}
+
+.new-conversation-button {
+  margin-left: 10px;
+}
+
+/* Biểu tượng người dùng */
+.user-avatar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 10; /* Đảm bảo biểu tượng nằm trên tất cả các phần khác */
+}
+
+/* Menu người dùng */
+.user-menu {
+  position: absolute;
+  top: 50px; /* Vị trí menu */
+  right: 10px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 20; /* Đảm bảo menu nằm trên tất cả */
+}
+
+.user-menu ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+}
+
+.user-menu li {
+  display: flex;
+  align-items: center; /* Center the icons vertically */
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.user-menu li .svg-inline--fa {
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.user-menu li:hover {
+  background-color: #f0f0f0;
+}
