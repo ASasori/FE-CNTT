@@ -4,6 +4,32 @@
   height: 100vh;
   position: relative;
 }
+/* Thanh cuộn */
+.sidebar::-webkit-scrollbar {
+  width: 8px; /* Độ rộng của thanh cuộn */
+}
+
+/* Phần cầm của thanh cuộn */
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: #888; /* Màu của phần cầm */
+  border-radius: 10px; /* Bo tròn các cạnh */
+}
+
+/* Màu khi hover phần cầm */
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Màu khi hover */
+}
+
+/* Phần nền của thanh cuộn */
+.sidebar::-webkit-scrollbar-track {
+  background: #f0f0f0; /* Màu nền của thanh cuộn */
+  border-radius: 10px; /* Bo tròn các cạnh */
+}
+
+/* Tùy chỉnh màu sắc và chiều rộng cho các phần khác */
+.sidebar::-webkit-scrollbar-track:hover {
+  background: #e0e0e0; /* Màu khi hover trên nền */
+}
 
 /* Sidebar */
 .sidebar {
@@ -100,7 +126,7 @@
 
 .message.user {
   align-self: flex-end;
-  background-color: #007bff;
+  background-color: #06090b;
   color: white;
 }
 
@@ -148,8 +174,8 @@
 /* Biểu tượng người dùng */
 .user-avatar {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   cursor: pointer;
   z-index: 10; /* Đảm bảo biểu tượng nằm trên tất cả các phần khác */
 }
@@ -186,4 +212,133 @@
 
 .user-menu li:hover {
   background-color: #f0f0f0;
+}
+
+.clear-conversation-button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.clear-conversation-button:hover {
+  background-color: #c9302c;
+}
+
+/* Styles for delete icon in conversation list */
+.delete-icon {
+  margin-left: 8px;
+  color: #c9302c;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.delete-icon:hover {
+  color: #d9534f;
+}
+.send-icon {
+  width: 24px;  /* Adjust this value to set the width */
+  height: 24px; /* Adjust this value to set the height */
+  background-color: #ccc;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* Add some space below the header */
+}
+
+.medical-icon {
+  width: 30px; /* Adjust size as needed */
+  height: 30px;
+  margin-right: 10px; /* Space between icon and title */
+}
+.options-icon {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.options-icon:hover {
+  color: #333;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  margin-top: 5px;
+  z-index: 10;
+}
+/* Sidebar conversation item styling */
+.conversation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Menu icon styling */
+.menu-icon {
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.menu-icon:hover {
+  color: #333;
+}
+
+/* Options menu styling */
+.options-menu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  width: 120px;
+  padding: 5px 0;
+}
+
+/* Option button styling */
+.option-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.option-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Option icon styling */
+.option-icon {
+  margin-right: 8px;
+  color: #555;
+}
+
+.conversation-item.active {
+  background-color: #ec1010; /* Change to your preferred highlight color */
+  border-radius: 5px;
+  padding: 5px;
 }

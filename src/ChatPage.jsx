@@ -1,24 +1,76 @@
 import React, { useState } from 'react';
 import './ChatPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faUserCircle, faCog, faTh, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faUserCircle, faCog, faTh, faSignOutAlt, faTrash, faEllipsisV, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { ReactComponent as SendIcon } from './assets/icons/send.svg'; // Import your SVG icon for the send button
+import { ReactComponent as MedicalIcon } from './assets/icons/symbol.svg'; // Import your SVG icon here
 
-function Sidebar({ conversations, onSelectConversation, isOpen, onRenameConversation }) {
+
+
+function Sidebar({ conversations, onSelectConversation,currentConversationIndex,onRenameConversation, onDeleteConversation, isOpen, onClearConversation }) {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [editMode, setEditMode] = useState(null);
+
+  const handleMenuToggle = (index) => {
+    if (activeIndex === index) {
+      setActiveIndex(null);
+    } else {
+      setActiveIndex(index);
+    }
+  };
+
+  const handleRenameClick = (index) => {
+    setEditMode(index);
+    setActiveIndex(null); // Ẩn menu sau khi nhấn "Rename"
+  };
+
+  const handleRenameBlur = (index) => {
+    setEditMode(null); // Thoát chế độ chỉnh sửa khi mất focus
+  };
+
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
       <h2>Conversations</h2>
       <ul>
         {conversations.map((conv, index) => (
-          <li key={index} onClick={() => onSelectConversation(index)}>
-            <input
-              type="text"
-              value={conv.name}
-              onChange={(e) => onRenameConversation(index, e.target.value)}
-              style={{ width: '100%', border: 'none', background: 'transparent', padding: '5px' }}
+          <li key={index} 
+          className={`conversation-item ${index === currentConversationIndex ? 'active' : ''}`}
+          onClick={() => onSelectConversation(index)}>
+
+            
+            {editMode === index ? (
+              <input
+                type="text"
+                value={conv.name}
+                onChange={(e) => onRenameConversation(index, e.target.value)}
+                onBlur={() => handleRenameBlur(index)} // Kết thúc chỉnh sửa khi mất focus
+                autoFocus
+                style={{ width: '80%', border: 'none', background: 'transparent', padding: '5px' }}
+              />
+            ) : (
+              <span onClick={() => onSelectConversation(index)} style={{ width: '80%', cursor: 'pointer' }}>
+                {conv.name}
+              </span>
+            )}
+            <FontAwesomeIcon
+              icon={faEllipsisV}
+              className="menu-icon"
+              onClick={() => handleMenuToggle(index)}
             />
+            {activeIndex === index && (
+              <div className="options-menu">
+                <button className="option-button" onClick={() => handleRenameClick(index)}>
+                  <FontAwesomeIcon icon={faEdit} className="option-icon" /> Rename
+                </button>
+                <button className="option-button" onClick={() => onDeleteConversation(index)}>
+                  <FontAwesomeIcon icon={faTrash} className="option-icon" /> Delete
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>
+      <button onClick={onClearConversation} className="clear-conversation-button">Clear All Conversations</button>
     </div>
   );
 }
@@ -82,6 +134,17 @@ function ChatPage() {
     setConversations(updatedConversations);
   };
 
+  const handleDeleteConversation = (index) => {
+    const updatedConversations = conversations.filter((_, i) => i !== index);
+    setConversations(updatedConversations);
+    setCurrentConversationIndex(0);
+  };
+
+  const handleClearConversation = () => {
+    const updatedConversations = conversations.map((conv) => ({ ...conv, messages: [] }));
+    setConversations(updatedConversations);
+  };
+
   return (
     <div className="chat-page">
       <button onClick={toggleSidebar} className="toggle-sidebar-button">
@@ -111,11 +174,21 @@ function ChatPage() {
       <Sidebar
         conversations={conversations}
         onSelectConversation={handleSelectConversation}
+        currentConversationIndex={currentConversationIndex} // Pass current index as a prop
         isOpen={isSidebarOpen}
         onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
+        onClearConversation={handleClearConversation}
       />
-      
+
       <div className={`chat-container ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
+        {/* Title and Icon */}
+        <div className="chat-header">
+          <MedicalIcon className="medical-icon" />
+          <h2>Medical ChatBot</h2>
+        </div>
+
+        {/* Chat Window */}
         <div className="chat-window">
           {currentConversation.messages.map((msg, index) => (
             <div key={index} className={`message ${msg.sender}`}>
@@ -123,6 +196,8 @@ function ChatPage() {
             </div>
           ))}
         </div>
+
+        {/* Message Input Box */}
         <div className="chat-input-container">
           <input
             type="text"
@@ -132,7 +207,9 @@ function ChatPage() {
             className="chat-input"
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
           />
-          <button onClick={handleSendMessage} className="send-button">Send</button>
+          <button onClick={handleSendMessage} className="send-button">
+            <SendIcon className="send-icon" />
+          </button>
           <button onClick={handleNewConversation} className="new-conversation-button">New Conversation</button>
         </div>
       </div>
