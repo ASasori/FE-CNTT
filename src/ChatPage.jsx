@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './ChatPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faUserCircle, faCog, faTh, faSignOutAlt, faTrash, faEllipsisV, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { ReactComponent as SendIcon } from './assets/icons/send.svg'; // Import your SVG icon for the send button
 import { ReactComponent as MedicalIcon } from './assets/icons/symbol.svg'; // Import your SVG icon here
-
+import axios from 'axios'; // Import axios
 
 
 function Sidebar({ conversations, onSelectConversation,currentConversationIndex,onRenameConversation, onDeleteConversation, isOpen, onClearConversation }) {
@@ -76,7 +76,7 @@ function Sidebar({ conversations, onSelectConversation,currentConversationIndex,
 }
 
 function ChatPage() {
-  const [conversations, setConversations] = useState([{ id: 1, name: 'Conversation 1', messages: [] }]);
+  const [conversations, setConversations] = useState([]);
   const [currentConversationIndex, setCurrentConversationIndex] = useState(0); 
   const [input, setInput] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); 
@@ -84,38 +84,159 @@ function ChatPage() {
 
   const currentConversation = conversations[currentConversationIndex];
 
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtMnhjNWdlYTAwMDB1am40azBoNjM5MDYiLCJpYXQiOjE3MzAzODA5ODgsImV4cCI6MTc2MTkxNjk4OH0._Yv6DAMFRSMBDp7XWN9EqIup1H98SWPj974D6FXmBBc';
+  
   const handleSendMessage = () => {
     if (input.trim()) {
-      const updatedConversations = [...conversations];
-      updatedConversations[currentConversationIndex].messages.push({
-        text: input,
-        sender: 'user',
-      });
-      setConversations(updatedConversations);
-
-      setTimeout(() => {
-        const updatedConversations = [...conversations];
-        updatedConversations[currentConversationIndex].messages.push({
-          text: 'Bot response...',
-          sender: 'bot',
+      const currentConversationId = conversations[currentConversationIndex]?.id;
+  
+      if (currentConversationId) {
+        // Construct the request payload
+        const payload = {
+          boxChatId: currentConversationId,
+          content: input.trim(),
+        };
+  
+        // Send the POST request
+        axios.post('http://localhost:3000/messenger', payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(response => {
+          // Extract message details from the response
+          const newMessage = {
+            text: response.data.data.content,
+            sender: 'user',
+          };
+  
+          // Update the conversation with the new message
+          setConversations(prevConversations => {
+            const updatedConversations = [...prevConversations];
+            updatedConversations[currentConversationIndex].messages = [
+              ...updatedConversations[currentConversationIndex].messages,
+              newMessage
+            ];
+            return updatedConversations;
+          });
+  
+          // Clear the input field after sending
+          setInput('');
+  
+          // Simulate bot response
+          setTimeout(() => {
+            const botResponse = {
+              text: 'Bot response...',
+              sender: 'bot',
+            };
+            setConversations(prevConversations => {
+              const updatedConversations = [...prevConversations];
+              updatedConversations[currentConversationIndex].messages.push(botResponse);
+              return updatedConversations;
+            });
+          }, 1000);
+        })
+        .catch(error => {
+          console.error('Error sending message:', error);
         });
-        setConversations(updatedConversations);
-      }, 1000);
-
-      setInput('');
+      }
     }
   };
+  
+
+// Fetch conversations effect
+useEffect(() => {
+  axios.get('http://localhost:3000/box-chat', {
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+  })
+  .then(response => {
+      const conversationsData = response.data.data.map(item => ({
+          id: item.boxChatId,
+          name: item.name,
+          messages: []
+      }));
+      
+      setConversations(conversationsData);
+     // Kiểm tra nếu có chỉ số được lưu trong localStorage
+     const savedIndex = localStorage.getItem('selectedConversationIndex');
+     if (savedIndex !== null && savedIndex < conversationsData.length) {
+         setCurrentConversationIndex(parseInt(savedIndex, 10)); // Đặt chỉ số được lưu
+     } else if (conversationsData.length > 0) {
+         setCurrentConversationIndex(0); // Chọn box chat đầu tiên nếu không có chỉ số lưu trước đó
+     }
+  })
+  .catch(error => {
+      console.error('Error fetching data:', error);
+  });
+}, [token]); // Fetch conversations only once when the token changes
+
+// Fetch selected conversation effect
+useEffect(() => {
+  if (currentConversationIndex >= 0 && conversations.length > 0) {
+    const selectedConversationId = conversations[currentConversationIndex]?.id;
+
+    if (selectedConversationId) {
+      axios.get(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(response => {
+        const conversationData = response.data.data;
+        const messages = conversationData.Messenger.map(msg => ({
+          text: msg.content,
+          sender: 'user',
+        }));
+
+        setConversations(prevConversations => {
+          // Chỉ cập nhật nếu dữ liệu thực sự thay đổi
+          if (JSON.stringify(prevConversations[currentConversationIndex]?.messages) !== JSON.stringify(messages)) {
+            const updatedConversations = [...prevConversations];
+            updatedConversations[currentConversationIndex].messages = messages;
+            return updatedConversations;
+          }
+          return prevConversations;
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching conversation data:', error);
+      });
+    }
+  }
+}, [currentConversationIndex, conversations.length, token]);
 
   const handleSelectConversation = (index) => {
     setCurrentConversationIndex(index);
+    localStorage.setItem('selectedConversationIndex', index); // Lưu vào localStorage
   };
 
   const handleNewConversation = () => {
-    const newConversation = { id: conversations.length + 1, name: `Conversation ${conversations.length + 1}`, messages: [] };
-    setConversations([...conversations, newConversation]);
-    setCurrentConversationIndex(conversations.length);
+    axios.post('http://localhost:3000/box-chat', {
+      name: `New Conversation`, // Name of the new conversation
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(response => {
+      // Get the new conversation data from the response
+      const newConversation = {
+        id: response.data.data.boxChatId, // Adjust the key as needed based on API response structure
+        name: response.data.data.name,
+        messages: []
+      };
+  
+      // Update the local state with the new conversation
+      setConversations([...conversations, newConversation]);
+      setCurrentConversationIndex(conversations.length); // Set the current index to the new conversation
+    })
+    .catch(error => {
+      console.error('Error creating a new conversation:', error);
+    });
   };
-
+  
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -129,16 +250,46 @@ function ChatPage() {
   };
 
   const handleRenameConversation = (index, newName) => {
-    const updatedConversations = [...conversations];
-    updatedConversations[index].name = newName;
-    setConversations(updatedConversations);
+    const selectedConversationId = conversations[index].id;
+  
+    axios.patch(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+      name: newName,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(response => {
+      // Update the conversation name in the frontend after a successful response
+      const updatedConversations = [...conversations];
+      updatedConversations[index].name = response.data.data.name;
+      setConversations(updatedConversations);
+    })
+    .catch(error => {
+      console.error('Error updating conversation name:', error);
+    });
   };
-
+  
   const handleDeleteConversation = (index) => {
-    const updatedConversations = conversations.filter((_, i) => i !== index);
-    setConversations(updatedConversations);
-    setCurrentConversationIndex(0);
+    const selectedConversationId = conversations[index].id;
+  
+    axios.delete(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(() => {
+      // Remove the conversation from the local state after a successful API call
+      const updatedConversations = conversations.filter((_, i) => i !== index);
+      setConversations(updatedConversations);
+      // Optionally, reset the current conversation index to the first available conversation or -1 if none
+      setCurrentConversationIndex(updatedConversations.length > 0 ? 0 : -1);
+    })
+    .catch(error => {
+      console.error('Error deleting the conversation:', error);
+    });
   };
+  
 
   const handleClearConversation = () => {
     const updatedConversations = conversations.map((conv) => ({ ...conv, messages: [] }));
@@ -189,13 +340,18 @@ function ChatPage() {
         </div>
 
         {/* Chat Window */}
-        <div className="chat-window">
-          {currentConversation.messages.map((msg, index) => (
-            <div key={index} className={`message ${msg.sender}`}>
-              {msg.text}
-            </div>
-          ))}
-        </div>
+<div className="chat-window">
+  {currentConversation && currentConversation.messages.length > 0 ? (
+    currentConversation.messages.map((msg, index) => (
+      <div key={index} className={`message ${msg.sender}`}>
+        {msg.text}
+      </div>
+    ))
+  ) : (
+    <p>No messages yet. Start a conversation!</p> // Hiển thị khi không có tin nhắn
+  )}
+</div>
+
 
         {/* Message Input Box */}
         <div className="chat-input-container">
