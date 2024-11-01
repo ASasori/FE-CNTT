@@ -5,8 +5,7 @@ import { faBars, faTimes, faUserCircle, faCog, faTh, faSignOutAlt, faTrash, faEl
 import { ReactComponent as SendIcon } from './assets/icons/send.svg'; // Import your SVG icon for the send button
 import { ReactComponent as MedicalIcon } from './assets/icons/symbol.svg'; // Import your SVG icon here
 import axios from 'axios'; // Import axios
-
-
+import { API_URL } from './api/apiConfig';
 function Sidebar({ conversations, onSelectConversation,currentConversationIndex,onRenameConversation, onDeleteConversation, isOpen, onClearConversation }) {
   const [activeIndex, setActiveIndex] = useState(null);
   const [editMode, setEditMode] = useState(null);
@@ -84,7 +83,7 @@ function ChatPage() {
 
   const currentConversation = conversations[currentConversationIndex];
 
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtMnhjNWdlYTAwMDB1am40azBoNjM5MDYiLCJpYXQiOjE3MzAzODA5ODgsImV4cCI6MTc2MTkxNjk4OH0._Yv6DAMFRSMBDp7XWN9EqIup1H98SWPj974D6FXmBBc';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtMnlma2h5NDAwMDB1cGhkbjZiZXRkcnoiLCJpYXQiOjE3MzA0NTI3ODQsImV4cCI6MTc2MTk4ODc4NH0.e5cwsiOVusdeiWGjt7yLK55VqlnuRswwsCVBYYYvqpY';
   
   const handleSendMessage = () => {
     if (input.trim()) {
@@ -98,7 +97,7 @@ function ChatPage() {
         };
   
         // Send the POST request
-        axios.post('http://localhost:3000/messenger', payload, {
+        axios.post('https://smart-q-and-a-about-medicine.onrender.com/messenger', payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -146,7 +145,7 @@ function ChatPage() {
 
 // Fetch conversations effect
 useEffect(() => {
-  axios.get('http://localhost:3000/box-chat', {
+  axios.get('https://smart-q-and-a-about-medicine.onrender.com/box-chat', {
       headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -178,7 +177,7 @@ useEffect(() => {
     const selectedConversationId = conversations[currentConversationIndex]?.id;
 
     if (selectedConversationId) {
-      axios.get(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+      axios.get(`https://smart-q-and-a-about-medicine.onrender.com/box-chat/${selectedConversationId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -213,7 +212,7 @@ useEffect(() => {
   };
 
   const handleNewConversation = () => {
-    axios.post('http://localhost:3000/box-chat', {
+    axios.post('https://smart-q-and-a-about-medicine.onrender.com/box-chat', {
       name: `New Conversation`, // Name of the new conversation
     }, {
       headers: {
@@ -252,7 +251,7 @@ useEffect(() => {
   const handleRenameConversation = (index, newName) => {
     const selectedConversationId = conversations[index].id;
   
-    axios.patch(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+    axios.patch(`https://smart-q-and-a-about-medicine.onrender.com/box-chat/${selectedConversationId}`, {
       name: newName,
     }, {
       headers: {
@@ -273,7 +272,7 @@ useEffect(() => {
   const handleDeleteConversation = (index) => {
     const selectedConversationId = conversations[index].id;
   
-    axios.delete(`http://localhost:3000/box-chat/${selectedConversationId}`, {
+    axios.delete(`https://smart-q-and-a-about-medicine.onrender.com/box-chat/${selectedConversationId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
