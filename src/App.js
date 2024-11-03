@@ -1,35 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ChatPage from './ChatPage'; 
-import Dashboard from './Dashboard'; 
+import React, { createContext, useState } from "react";
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ChatPage from "./ChatPage";
+import Dashboard from "./Dashboard";
+import Login from "./Login";
+import Register from "./Register";
+
+export const APP_CONTEXT = createContext({});
 function App() {
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>
-  //         Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //       <a
-  //         className="App-link"
-  //         href="https://reactjs.org"
-  //         target="_blank"
-  //         rel="noopener noreferrer"
-  //       >
-  //         Learn React
-  //       </a>
-  //     </header>
-  //   </div>
-  // );
+  const [user, setUser] = useState();
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <APP_CONTEXT.Provider
+      value={{
+        user,
+        setUser,
+      }}
+    >
+      <Router>
+        <Routes>
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </Router>
+    </APP_CONTEXT.Provider>
   );
 }
 
