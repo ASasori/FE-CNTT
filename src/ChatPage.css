@@ -84,8 +84,12 @@
   cursor: pointer;
   font-size: 24px; /* Tăng kích thước cho icon */
   z-index: 10;
+  transition: left 0.3s ease; /* Smooth transition */
 }
 
+.sidebar.closed + .toggle-sidebar-button {
+  left: calc(250px + 10px); /* Adjust this to move the button */
+}
 
 /* Container chính của trang chat */
 .chat-container {
@@ -102,7 +106,7 @@
 }
 
 .chat-container.full-width {
-  margin-left: -250px;
+  margin-left: -200px;
   
   /* width: 100%; */
 }
