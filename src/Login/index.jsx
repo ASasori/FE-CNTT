@@ -1,5 +1,5 @@
 import "./Login.css";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,6 +10,13 @@ const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { setUser } = useContext(APP_CONTEXT);
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Kiểm tra token
+    if (token) {
+      navigate("/chat"); // Chuyển hướng nếu đã đăng nhập
+    }
+  }, [navigate]); // Chạy khi component được mount
+
   const formik = useFormik({
     initialValues: {
       usernameOrEmail: "",
@@ -34,7 +41,7 @@ const Login = () => {
 
             if (userRes.data.data) {
               setUser(userRes.data.data);
-              navigate("/dashboard");
+              navigate("/chat");
             }
             localStorage.setItem("token", res.data.data.accessToken);
           }
