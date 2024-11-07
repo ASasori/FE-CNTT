@@ -186,7 +186,7 @@ const Register = () => {
                         class="btn btn-primary btn-block defaultButton"
                         type="submit"
                       >
-                        Đăng nhập
+                        Đăng ký
                       </button>
                     </div>
                   </form>

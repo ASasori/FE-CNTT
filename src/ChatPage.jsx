@@ -181,8 +181,8 @@ function ChatPage() {
     };
 
     loadConversation();
-    //}, [currentConversationIndex, conversations.length, conversations[currentConversationIndex]?.messages.length]);
-  }, [currentConversationIndex, conversations]);
+  }, [currentConversationIndex, conversations.length, conversations[currentConversationIndex]?.messages.length]);
+  //}, [currentConversationIndex, conversations]);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const handleSendMessage = async () => {
@@ -253,8 +253,8 @@ function ChatPage() {
   const handleNewConversation = async () => {
     try {
       const newConversation = await createNewConversation();
-      setConversations([...conversations, newConversation]);
-      setCurrentConversationIndex(conversations.length);
+      setConversations([newConversation, ...conversations]);
+      setCurrentConversationIndex(0);
     } catch (error) {
       console.error('Error creating a new conversation:', error);
     }
@@ -360,7 +360,10 @@ function ChatPage() {
                 key={index}
                 className={`message ${msg.sender === 'user' ? 'user-message' : 'chatbot-response'}`}
               >
-                {msg.text}
+                {/* {msg.text} */}
+                {msg.text.split("\n").map((line, lineIndex) => (
+                  <div key={lineIndex}>{line}</div> // Each line is displayed in a separate <div>
+                ))}
               </div>
             ))
           ) : (
