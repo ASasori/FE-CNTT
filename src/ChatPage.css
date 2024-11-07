@@ -372,3 +372,19 @@
 .model-dropdown li:hover {
   background-color: #f0f0f0;
 }
+
+.user-message {
+  background-color: #d1f7c4;
+  text-align: right;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+.chatbot-response {
+  background-color: #f0f0f0;
+  text-align: left;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}

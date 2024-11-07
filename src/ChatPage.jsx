@@ -98,7 +98,6 @@ function Sidebar({ conversations, onSelectConversation, currentConversationIndex
   );
 }
 
-
 function ChatPage() {
   const [conversations, setConversations] = useState([]);
   const [currentConversationIndex, setCurrentConversationIndex] = useState(0);
@@ -159,11 +158,17 @@ function ChatPage() {
   }, []);
 
   useEffect(() => {
+    console.log('useEffect chạy để tải tin nhắn cuộc hội thoại');
     const loadConversation = async () => {
       if (currentConversationIndex >= 0 && conversations.length > 0) {
         const conversationId = conversations[currentConversationIndex].id;
         try {
-          const messages = await fetchConversationById(conversationId);
+          let messages = await fetchConversationById(conversationId);
+          // Log each message with a distinction between user and chatbot
+          messages = messages.reverse();
+          messages.forEach((msg, index) => {
+            console.log(`Message ${index + 1}:`, msg.sender === 'user' ? 'User' : 'Chatbot', '-', msg.text);
+          });
           setConversations(prevConversations => {
             const updatedConversations = [...prevConversations];
             updatedConversations[currentConversationIndex].messages = messages;
@@ -176,27 +181,74 @@ function ChatPage() {
     };
 
     loadConversation();
-  }, [currentConversationIndex, conversations.length]);
+  }, [currentConversationIndex, conversations.length, conversations[currentConversationIndex]?.messages.length]);
+  //}, [currentConversationIndex, conversations]);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const handleSendMessage = async () => {
     if (input.trim()) {
       const conversationId = conversations[currentConversationIndex]?.id;
+
+      // Thêm tin nhắn của người dùng vào cuộc trò chuyện
+      setConversations(prevConversations => {
+        const updatedConversations = [...prevConversations];
+        updatedConversations[currentConversationIndex].messages.push({
+          text: input.trim(),
+          sender: 'user',
+        });
+        return updatedConversations;
+      });
+
+      // Xóa trường nhập liệu
+      setInput('');
+
+      // Thêm chỉ báo "typing"
+      setIsWaitingForResponse(true); // Bắt đầu trạng thái đợi phản hồi
+      setConversations(prevConversations => {
+        const updatedConversations = [...prevConversations];
+        updatedConversations[currentConversationIndex].messages.push({
+          text: 'Đang chờ phản hồi...', // Thông báo hiển thị
+          sender: 'typing',
+        });
+        return updatedConversations;
+      });
+
       try {
+        // Gửi tin nhắn tới backend và đợi phản hồi
         const response = await sendMessageToBackend(input.trim(), conversationId);
+
+        // Cập nhật cuộc trò chuyện với phản hồi từ chatbot
         setConversations(prevConversations => {
           const updatedConversations = [...prevConversations];
-          updatedConversations[currentConversationIndex].messages.push({
+          const messages = updatedConversations[currentConversationIndex].messages;
+
+          // Xóa chỉ báo "typing"
+          messages.pop();
+
+          // Thêm phản hồi thực tế từ chatbot
+          messages.push({
             text: response,
-            sender: 'user',
+            sender: 'bot',
           });
+
           return updatedConversations;
         });
-        setInput('');
       } catch (error) {
         console.error('Error sending message:', error);
+
+        // Xóa chỉ báo "typing" nếu có lỗi
+        setConversations(prevConversations => {
+          const updatedConversations = [...prevConversations];
+          updatedConversations[currentConversationIndex].messages.pop();
+          return updatedConversations;
+        });
+      } finally {
+        setIsWaitingForResponse(false); // Kết thúc trạng thái đợi phản hồi
       }
     }
   };
+
+
 
   const handleNewConversation = async () => {
     try {
@@ -304,12 +356,20 @@ function ChatPage() {
         <div className="chat-window">
           {currentConversation && currentConversation.messages.length > 0 ? (
             currentConversation.messages.map((msg, index) => (
-              <div key={index} className={`message ${msg.sender}`}>
+              <div
+                key={index}
+                className={`message ${msg.sender === 'user' ? 'user-message' : 'chatbot-response'}`}
+              >
                 {msg.text}
               </div>
             ))
           ) : (
             <p>No messages yet. Start a conversation!</p> // Hiển thị khi không có tin nhắn
+          )}
+          {isWaitingForResponse && (
+            <div className="waiting-indicator">
+              <span>🤖 Đang chờ phản hồi từ chatbot...</span>
+            </div>
           )}
           <div className="chat-header">
             {/* Thêm SVG vào trong header */}
@@ -331,13 +391,14 @@ function ChatPage() {
             {showDropdown && (
               <div className="model-dropdown" ref={dropdownRef}>
                 <ul>
-                  <li onClick={() => handleModelSelect('GPT-4.0')}>GPT-4.0</li>
+                  <li onClick={() => handleModelSelect('Gemini')}>Gemini</li>
                   <li onClick={() => handleModelSelect('GPT-3.5')}>GPT-3.5</li>
                   <li onClick={() => handleModelSelect('Auto')}>Auto</li>
                 </ul>
               </div>
             )}
           </div>
+
         </div>
 
 
