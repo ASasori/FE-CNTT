@@ -67,7 +67,7 @@ const Login = () => {
               </div>
               <div className="login-right">
                 <div className="login-right-wrap">
-                  <h1>Welcome to Dev Center</h1>
+                  <h1>Welcome to Medical Chat Bot</h1>
                   <p className="account-subtitle"></p>
                   <form onSubmit={formik.handleSubmit}>
                     <div className="form-group">
