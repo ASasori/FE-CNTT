@@ -40,14 +40,8 @@ const Register = () => {
         const res = await register(values);
         if (res.status === 200) {
           if (res.data.data) {
-            const userRes = await getUserInfoFromToken(
-              res.data.data.accessToken
-            );
+            navigate("/chat");
 
-            if (userRes.data.data) {
-              setUser(userRes.data.data);
-              navigate("/dashboard");
-            }
             localStorage.setItem("token", res.data.data.accessToken);
           }
         }
@@ -73,7 +67,7 @@ const Register = () => {
               </div>
               <div className="login-right">
                 <div className="login-right-wrap">
-                  <h1>Welcome to Dev Center</h1>
+                  <h1>Welcome to Medical Chat Bot</h1>
                   <p className="account-subtitle"></p>
                   <form onSubmit={formik.handleSubmit}>
                     <div className="form-group">

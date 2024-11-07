@@ -19,6 +19,7 @@ function App() {
     >
       <Router>
         <Routes>
+          <Route path="" element={<ChatPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
