@@ -58,10 +58,14 @@ export const fetchConversationById = async (conversationId) => {
       },
     });
 
-    return response.data.data.Messenger.map(msg => ({
-      text: msg.content,
-      sender: 'user',
-    }));
+    return response.data.data.Messenger.map(msg => {
+      // Check if the username or userId matches to distinguish between user and chatbot
+      const isChatbot = msg.User.username === 'systemSpokeAI'; // Adjust this condition as needed
+      return {
+        text: msg.content,
+        sender: isChatbot ? 'chatbot' : 'user',
+      };
+    });
   } catch (error) {
     console.error('Error fetching conversation data:', error);
     throw new Error('Server Error');
